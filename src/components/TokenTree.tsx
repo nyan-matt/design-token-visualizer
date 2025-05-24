@@ -39,7 +39,7 @@ export default function TokenTree({ tokens, onTokenSelect, selectedToken }: Toke
     const basePadding = level * 12;
     const leafExtraPadding = 20;
 
-    if ('$value' in node) {
+    if ('$value' in node || 'value' in node) {
       return (
         <div
           key={path}
