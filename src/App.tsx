@@ -6,6 +6,7 @@ import TokenDetails from './components/TokenDetails';
 import FileUpload from './components/FileUpload';
 import { TokenNode, TokenGraph } from './types/tokens';
 import { generateTokenGraph } from './utils/referenceResolver';
+import { replaceSpacesInKeys } from './utils/tokenParser'; // <-- Import the sanitizer
 
 function App() {
   const [tokens, setTokens] = useState<TokenNode | null>(null);
@@ -27,8 +28,10 @@ function App() {
     return () => window.removeEventListener('tokenNodeClick', handler);
   }, [tokens]);
 
+  // Sanitize tokens immediately after file upload
   const handleFileUpload = (jsonData: TokenNode) => {
-    setTokens(jsonData);
+    const sanitized = replaceSpacesInKeys(jsonData);
+    setTokens(sanitized);
   };
 
   const handleTokenSelect = (tokenPath: string) => {
@@ -80,4 +83,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

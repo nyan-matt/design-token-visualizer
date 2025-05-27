@@ -11,6 +11,14 @@ function getDotPath(fullPath: string): string {
   return fullPath;
 }
 
+// Helper: get the value from a token node, supporting both $value and value
+function getTokenValue(node: any): string | undefined {
+  if (!node) return undefined;
+  if (typeof node.$value === 'string') return node.$value;
+  if (typeof node.value === 'string') return node.value;
+  return undefined;
+}
+
 export function findUpstreamReferences(
   tokens: TokenNode,
   tokenPath: string,
@@ -24,18 +32,19 @@ export function findUpstreamReferences(
 
   // Find the node for the selected token
   const node = findNodeByDotPath(tokens, getDotPath(tokenPath));
-  if (node && typeof node.$value === 'string') {
-    const refs = parseTokenReferences(node.$value);
+  const nodeValue = getTokenValue(node);
+  if (node && typeof nodeValue === 'string') {
+    const refs = parseTokenReferences(nodeValue);
     for (const ref of refs) {
       // Find the full path for the referenced node
       const refNode = findNodeByDotPath(tokens, ref);
       if (refNode) {
         // Find the full path for display
         const refFullPath = findFullPathForDotPath(tokens, ref);
-      references.push({
+        references.push({
           path: refFullPath,
           value: resolveTokenValue(tokens, refFullPath)
-      });
+        });
         references.push(...findUpstreamReferences(tokens, refFullPath, visited));
       }
     }
@@ -72,20 +81,21 @@ export function findDownstreamReferences(
     // Skip if node is not an object
     if (typeof node !== 'object' || node === null) return;
 
-    if ('$value' in node) {
-      const value = node.$value;
-      if (typeof value === 'string' && value.includes(`{${dotPath}}`)) {
-        references.push({
-          path: currentPath,
-          value: value
-        });
-      }
-    } else {
-      Object.entries(node).forEach(([key, value]) => {
-        const newPath = currentPath ? `${currentPath}.${key}` : key;
-        traverse(value, newPath);
+    const value = getTokenValue(node);
+    if (typeof value === 'string' && value.includes(`{${dotPath}}`)) {
+      references.push({
+        path: currentPath,
+        value: value
       });
     }
+
+    // Traverse children if not a leaf node
+    Object.entries(node).forEach(([key, child]) => {
+      // Avoid recursing into $value or value keys
+      if (key === '$value' || key === 'value') return;
+      const newPath = currentPath ? `${currentPath}.${key}` : key;
+      traverse(child, newPath);
+    });
   }
 
   traverse(tokens);
@@ -113,8 +123,9 @@ export function buildUpstreamChain(tokens: TokenNode, tokenPath: string): string
     visited.add(currentPath);
     chain.unshift(currentPath); // Add to the front (so root-most is first)
     const node = findNodeByDotPath(tokens, getDotPath(currentPath));
-    if (node && typeof node.$value === 'string') {
-      const refs = parseTokenReferences(node.$value);
+    const nodeValue = getTokenValue(node);
+    if (node && typeof nodeValue === 'string') {
+      const refs = parseTokenReferences(nodeValue);
       if (refs.length > 0) {
         // Only follow the first reference for the chain (assume single inheritance)
         const refFullPath = findFullPathForDotPath(tokens, refs[0]);
@@ -125,4 +136,4 @@ export function buildUpstreamChain(tokens: TokenNode, tokenPath: string): string
     break;
   }
   return chain;
-} 
+}
