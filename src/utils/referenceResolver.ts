@@ -28,7 +28,7 @@ export function findUpstreamReferences(
   visited.add(tokenPath);
 
   const references: TokenReference[] = [];
-  const tokenValue = resolveTokenValue(tokens, tokenPath);
+  //const tokenValue = resolveTokenValue(tokens, tokenPath);
 
   // Find the node for the selected token
   const node = findNodeByDotPath(tokens, getDotPath(tokenPath));

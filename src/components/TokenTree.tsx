@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { TokenNode, TokenValue } from '../types/tokens';
 
 interface TokenTreeProps {

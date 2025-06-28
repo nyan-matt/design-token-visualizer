@@ -1,4 +1,4 @@
-import { TokenNode, TokenValue, TokenFile } from '../types/tokens';
+import { TokenFile } from '../types/tokens';
 
 export function parseTokenReferences(value: string): string[] {
   const regex = /\{([^}]+)\}/g;

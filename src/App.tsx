@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Split from 'react-split';
 import TokenTree from './components/TokenTree';
 import MermaidGraph from './components/MermaidGraph';

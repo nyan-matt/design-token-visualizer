@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 import { TokenGraph, TokenNode } from '../types/tokens';
 import { buildUpstreamChain } from '../utils/referenceResolver';
